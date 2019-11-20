@@ -1,20 +1,69 @@
+########################################################################
+####################### Makefile Template ##############################
+########################################################################
 
-CROSS_COMPILE :=arm-linux-gnueabihf-
-CC		:=$(CROSS_COMPILE)gcc
-LD		:=$(CROSS_COMPILE)ld
-OBJCOPY :=$(CROSS_COMPILE)objcopy
-OBJDUMP :=$(CROSS_COMPILE)objdump
+# Compiler settings - Can be customized.
+CC = arm-linux-gnueabihf-gcc
+CXXFLAGS = -std=c11 -Wall
+LDFLAGS = 
+DEBUG   = 
+# Makefile settings - Can be customized.
+APPNAME = main
+EXT = .c
+SRCDIR = src
+OBJDIR = obj
+DEPDIR = dep
+############## Do not change anything from here downwards! #############
+SRC = $(wildcard $(SRCDIR)/*$(EXT))
+OBJ = $(SRC:$(SRCDIR)/%$(EXT)=$(OBJDIR)/%.o)
+DEP = $(OBJ:$(OBJDIR)/%.o=$(DEPDIR)/%.d)
+# UNIX-based OS variables & settings
+RM = rm
+DELOBJ = $(OBJ)
+# Windows OS variables & settings
+DEL = del
+EXE = .exe
+WDELOBJ = $(SRC:$(SRCDIR)/%$(EXT)=$(OBJDIR)\\%.o)
 
-OBJS	:= main.o
+########################################################################
+####################### Targets beginning here #########################
+########################################################################
 
-$(NAME).bin :$(OBJS)
-	S(LD) -g -o $(NAME)
+all: $(APPNAME)
 
-%.o : %.c
-	$(CC) -Wall -g -nostdlib -c -O0 -o $@ $<
+# Builds the app
+$(APPNAME): $(OBJ)
+	$(CC) $(CXXFLAGS)  $(DEBUG) -o $@ $^ $(LDFLAGS)
 
-%.o : %.S
-	$(CC) -Wall -g -nostdlib -c -O0 -o $@ $<
+# Creates the dependecy rules
+$(DEPDIR)/%.d: $(SRCDIR)/%$(EXT)
+	@$(CPP) $(CFLAGS) $< -MM -MT $(@:%.d=$(OBJDIR)/%.o) >$@
 
+# Includes all .h files
+-include $(DEP)
+
+# Building rule for .o files and its .c/.cpp in combination with all .h
+$(OBJDIR)/%.o: $(SRCDIR)/%$(EXT)
+	$(CC) $(CXXFLAGS)  $(DEBUG) -o $@ -c $<
+
+################### Cleaning rules for Unix-based OS ###################
+# Cleans complete project
+.PHONY: clean
 clean:
-	rm -rf *.o *.bin
+	$(RM) $(DELOBJ) $(DEP) $(APPNAME)
+
+# Cleans only all files with the extension .d
+.PHONY: cleandep
+cleandep:
+	$(RM) $(DEP)
+
+#################### Cleaning rules for Windows OS #####################
+# Cleans complete project
+.PHONY: cleanw
+cleanw:
+	$(DEL) $(WDELOBJ) $(DEP) $(APPNAME)$(EXE)
+
+# Cleans only all files with the extension .d
+.PHONY: cleandepw
+cleandepw:
+	$(DEL) $(DEP)
