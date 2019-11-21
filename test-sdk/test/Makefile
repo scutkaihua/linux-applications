@@ -32,8 +32,10 @@ WDELOBJ = $(SRC:$(SRCDIR)/%$(EXT)=$(OBJDIR)\\%.o)
 
 all: CHECKDIRS  $(APPNAME) 
 
+#check  directories for tmp files while building
 CHECKDIRS:
-	mkdir -p $(SUBDIRS)		
+	if ! [ -f $(DEPDIR) ] ;then  mkdir -p $(SUBDIRS)	;fi	
+	
 # Builds the app
 $(APPNAME): $(OBJ)
 	$(CC) $(CXXFLAGS)  $(DEBUG) -o $@ $^ $(LDFLAGS)

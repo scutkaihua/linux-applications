@@ -1,0 +1,1 @@
+cmd_/mnt/hgfs/F/linux/helloworld/helloworld.ko := arm-linux-gnueabihf-ld -EL -r  -T ./scripts/module-common.lds --build-id  -o /mnt/hgfs/F/linux/helloworld/helloworld.ko /mnt/hgfs/F/linux/helloworld/helloworld.o /mnt/hgfs/F/linux/helloworld/helloworld.mod.o
